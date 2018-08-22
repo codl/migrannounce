@@ -1,0 +1,54 @@
+/* foo */
+
+body {
+    max-width: 40em;
+    margin: auto;
+    line-height: 1.3em;
+    font-family: sans-serif;
+    color: #fffcfc;
+    background: black;
+}
+
+h1 {
+    margin: 4rem 0 2rem 0;
+}
+
+input {
+    background: #333;
+    color: white;
+    border: none;
+    padding: .3em .2em;
+}
+
+#login-form.loading::after {
+    content: ' ';
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    box-sizing: border-box;
+    margin-left: 1ch;
+    vertical-align: text-bottom;
+    border: .2em solid pink;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    border-radius: 100%;
+    animation: spinner 1400ms ease-out infinite;
+    transform: rotate(60deg);
+
+}
+
+@keyframes spinner {
+    from {
+        transform: rotate(-1500deg);
+    }
+}
+
+.error {
+    background: #250505;
+    border: 1px solid #c55446;
+    padding: .6em 1em;
+}
+
+.error.not-shown {
+    display: none;
+}
