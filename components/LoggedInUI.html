@@ -60,7 +60,7 @@
         }
         return fetch(full_url, opts).then(resp => {
             if(resp.status == 429){
-                return delay(Math.random()*5000 + 1000).then(this.query(url, opts));
+                return delay(Math.random()*5000 + 1000).then(()=>this.query(url, opts));
             } else if(!resp.ok){
                 throw ["not ok", resp];
             } else {
@@ -91,6 +91,15 @@
                     this.set({loaded: true});
                 }
             });
+    }
+
+    function delay_for_rate_limit(response){
+        let tokens = response.headers.get('x-ratelimit-remaining');
+        let reset = response.headers.get('x-ratelimit-reset');
+        let millis_until_reset = new Date(reset) - new Date();
+        let wait_for = millis_until_reset / tokens;
+        wait_for *= 2; // to be safe
+        return delay(wait_for);
     }
 
     export default {
@@ -130,8 +139,7 @@
                     let msg = chain.then(()=>this.message(follower, message));
                     msg.then(()=>this.mark_success(follower))
                     msg.catch(e=>this.mark_failure(follower, e))
-
-                    chain = msg;
+                    chain = msg.then(delay_for_rate_limit)
                 }
             },
             message(follower, contents){

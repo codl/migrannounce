@@ -1,5 +1,10 @@
 <li class={className}>
     <Person person={follower} />
+    {#if follower.success}
+        OK!
+    {:elseif follower.failure}
+    Failed! {follower.failure}
+    {/if}
 </li>
 
 <script>
