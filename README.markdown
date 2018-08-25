@@ -1,4 +1,4 @@
-this is a tool to tell all your followers that you've moved accounts
+this is a tool, commissioned by my friend hoodie, to tell all your followers that you've moved accounts
 
 ## run your own
 
