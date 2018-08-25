@@ -22,7 +22,7 @@
     <ul class="followers">
         <p>Your followers:</p>
         {#each followers as follower}
-            <Follower follower={follower} success={follower.success} failure={follower.failure} />
+            <Follower follower={follower} success={follower.success} failure={follower.failure} on:retry='message(follower)' />
         {:else}
             <li class="placeholder">
                 (a distinct lack of followers)
@@ -136,22 +136,23 @@
                 let chain = Promise.resolve();
                 let {followers, message} = this.get();
                 for(let follower of followers){
-                    let msg = chain.then(()=>this.message(follower, message));
-                    msg.then(()=>this.mark_success(follower))
-                    msg.catch(e=>this.mark_failure(follower, e))
-                    chain = msg.then(delay_for_rate_limit)
+                    let msg = chain.then(()=>this.message(follower));
+                    chain = msg.then(delay_for_rate_limit).catch(()=>{});
                 }
             },
-            message(follower, contents){
+            message(follower){
+                let {message} = this.get();
                 let body = new URLSearchParams({
                     visibility: 'direct',
-                    status: '@' + follower.acct + ' ' + contents,
+                    status: '@' + follower.acct + ' ' + message,
                 });
-                return this.query('/statuses', {
+                let q = this.query('/statuses', {
                     method: 'post',
                     body: body,
                     headers: new Headers({ 'content-type': 'application/x-www-form-urlencoded' }),
                 })
+                q.then(()=>this.mark_success(follower)).catch(e=>this.mark_failure(follower, e));
+                return q;
             },
             mark_success(follower){
                 let {followers} = this.get();

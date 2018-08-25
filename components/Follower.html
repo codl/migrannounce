@@ -4,7 +4,9 @@
         {#if follower.success}
             Sent!
         {:elseif follower.failure}
-        Failed! {follower.failure}
+            Failed!
+            <button on:click=fire('retry')>Retry?</button>
+            <tt>{follower.failure}</tt>
         {/if}
     </span>
 </li>
@@ -25,6 +27,11 @@
                 return ""
             },
         },
+        methods: {
+            retry(){
+                this.get().retry();
+            },
+        }
     };
 </script>
 
