@@ -1,0 +1,187 @@
+{#if !me}
+
+    <p>Hang tight, talking to the server... <span class='spinner'/></p>
+
+{:else}
+
+    <p>Hi, <Person person={me} />! <button on:click="reload()">Log out</button></p>
+
+    {#if !loaded}
+    <p>Your followers are being fetched... <span class='spinner'/></p>
+    {:else}
+    <p>Ready to send a message to each one of your followers.</p>
+
+    <form on:submit='click_send(event)'>
+        <label>Your message:
+            <textarea disabled={ui_disabled} bind:value='message' cols=40 rows=10></textarea>
+        </label>
+        <button disabled={ui_disabled}>Send to all</button>
+    </form>
+    {/if}
+
+    <ul class="followers">
+        <p>Your followers:</p>
+        {#each followers as follower}
+            <Follower follower={follower} success={follower.success} failure={follower.failure} />
+        {:else}
+            <li class="placeholder">
+                (a distinct lack of followers)
+            </li>
+        {/each}
+    </ul>
+
+{/if}
+
+<script>
+    import Person from './Person.html';
+    import Follower from './Follower.html';
+    import {find_link} from '../lib/linkparse.js';
+
+    function delay(ms){
+        return new Promise(resolve => {
+            window.setTimeout(resolve, ms);
+        });
+    }
+
+    function query(url, opts){
+        let {userToken, server} = this.get()
+
+        if(!opts){
+            opts = {}
+        }
+        if(!opts.headers){
+            opts.headers = new Headers();
+        }
+        opts.headers.set('authorization', 'Bearer ' + userToken)
+        let full_url = url;
+        if(! url.startsWith('https://') && ! url.startsWith('http://')){
+            full_url = new URL(server);
+            full_url.pathname = '/api/v1' + url;
+        }
+        return fetch(full_url, opts).then(resp => {
+            if(resp.status == 429){
+                return delay(Math.random()*5000 + 1000).then(this.query(url, opts));
+            } else if(!resp.ok){
+                throw ["not ok", resp];
+            } else {
+                return resp;
+            }
+        });
+    }
+
+    function fetch_followers(next_page){
+        let {me} = this.get()
+
+        let url = '/accounts/' + me.id + '/followers';
+        if(next_page){
+            url = next_page;
+        }
+
+        let resp = this.query(url)
+        resp.then(resp => resp.json())
+            .then(json => {
+                let {followers} = this.get();
+                this.set({"followers": followers.concat(json)});
+            })
+        return resp.then(resp => find_link(resp.headers.get('link'), 'next'))
+            .then(link => {
+                if(link){
+                    return this.fetch_followers(link);
+                } else {
+                    this.set({loaded: true});
+                }
+            });
+    }
+
+    export default {
+        oncreate(){
+            this.query = query.bind(this)
+            this.fetch_followers = fetch_followers.bind(this)
+
+            this.query('/accounts/verify_credentials')
+                .then(resp => resp.json())
+                .then(account => this.set({me: account}))
+                .then(this.fetch_followers)
+        },
+
+        data() {
+            return {
+                loaded: false,
+                me: null,
+                followers: [],
+                message: "Hey, I've moved to (account)! See you there!",
+                ui_disabled: false,
+            }
+        },
+
+        methods: {
+            reload(){
+                window.location = window.location;
+            },
+            click_send(e){
+                e.preventDefault();
+                this.set({'ui_disabled': true})
+                this.message_all()
+            },
+            message_all(){
+                let chain = Promise.resolve();
+                let {followers, message} = this.get();
+                for(let follower of followers){
+                    let msg = chain.then(()=>this.message(follower, message));
+                    msg.then(()=>this.mark_success(follower))
+                    msg.catch(e=>this.mark_failure(follower, e))
+
+                    chain = msg;
+                }
+            },
+            message(follower, contents){
+                let body = new URLSearchParams({
+                    visibility: 'direct',
+                    status: '@' + follower.acct + ' ' + contents,
+                });
+                return this.query('/statuses', {
+                    method: 'post',
+                    body: body,
+                    headers: new Headers({ 'content-type': 'application/x-www-form-urlencoded' }),
+                })
+            },
+            mark_success(follower){
+                let {followers} = this.get();
+                for(let item of followers){
+                    if(item['id'] == follower['id']){
+                        item.success = 'true';
+                        break;
+                    }
+                }
+                this.set({followers: followers});
+            },
+            mark_failure(follower, error){
+                let {followers} = this.get();
+                for(let item of followers){
+                    if(item['id'] == follower['id']){
+                        console.log(item, error);
+                        item.failure = error;
+                        break;
+                    }
+                }
+                this.set({followers: followers});
+            },
+        },
+
+        components: { Person, Follower, },
+    };
+</script>
+
+
+<style>
+    .placeholder {
+        font-variant: italic;
+        opacity: .8;
+    }
+    textarea {
+        display: block;
+    }
+    ul {
+        list-style: none;
+    }
+</style>

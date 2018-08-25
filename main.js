@@ -1,5 +1,7 @@
 "use strict";
 
+import LoggedInUI from './components/LoggedInUI.html';
+
 (()=>{
 
     let normalise_server = server => {
@@ -55,7 +57,7 @@
         endpoint.pathname = '/api/v1/apps';
         let body = new URLSearchParams()
         body.set('scopes', 'read write')
-        body.set('client_name', 'Migrannouncement tool')
+        body.set('client_name', 'Migration tool (DEV)')
         body.set('redirect_uris', redirect_uri_for(server))
         //body.set('website', 'fill this in later')
 
@@ -95,7 +97,7 @@
             "client_id": client_id,
             "redirect_uri": redirect_uri_for(server),
             "response_type": "code",
-            "scopes": "read write",
+            "scope": "read write",
         })
         window.location = url.href
     }
@@ -110,7 +112,7 @@
         }
     }
 
-    async function collect_user_credentials(code, server) {
+    async function collect_user_token(code, server) {
         let app_creds = await get_app_credentials(server);
 
         let url = new URL(server);
@@ -154,11 +156,12 @@
         let params = new URLSearchParams(document.location.search);
         if(params.has('code') && params.has('server')){
             log_in_spinner(true);
-            // time to collect credentials
-            let credentials_p = collect_user_credentials(params.get('code'), params.get('server'))
+            let code = params.get('code');
+            let server = params.get('server');
+
+            let credentials_p = collect_user_token(code, server)
             credentials_p
-                .then(init_logged_in_ui)
-                .then(() => log_in_spinner(false))
+                .then(token => init_logged_in_ui(server, token))
 
                 .catch((e) => {
                     console.error(e);
@@ -172,8 +175,13 @@
 
     }
 
-    let init_logged_in_ui = async response => {
-        console.log(response)
+    let init_logged_in_ui = async (server, token) => {
+        let main = document.querySelector('main');
+        main.innerHTML = '';
+        let ui = new LoggedInUI({
+            target: main,
+            data: { userToken: token, server: server },
+        })
     }
 
     init();

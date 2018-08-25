@@ -1,0 +1,31 @@
+<li class={className}>
+    <Person person={follower} />
+</li>
+
+<script>
+    import Person from './Person.html';
+
+    export default {
+        components: { Person },
+        computed: {
+            className: ({ follower }) => {
+                if(follower.success){
+                    return "success";
+                }
+                if(follower.failure){
+                    return "failure";
+                }
+                return ""
+            },
+        },
+    };
+</script>
+
+<style>
+    .failure {
+        background: #ffcccc;
+    }
+    .success {
+        background: #aaffee;
+    }
+</style>

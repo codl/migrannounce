@@ -11,7 +11,7 @@ h1 {
     margin: 4rem 0 2rem 0;
 }
 
-#login-form.loading::after {
+#login-form.loading::after, .spinner {
     content: ' ';
     display: inline-block;
     width: 1em;

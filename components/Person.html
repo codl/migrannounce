@@ -1,0 +1,20 @@
+<img alt='' src={person.avatar} />
+{#if person.display_name}
+<b>{person.display_name}</b><tt>(@{person.acct})</tt>
+{:else}
+<b><tt>@{person.acct}</tt></b>
+{/if}
+
+<style>
+    img {
+        height: 1.2em;
+        width: 1.2em;
+        vertical-align: text-bottom;
+    }
+</style>
+
+<script>
+    export default {
+        immutable: true,
+    }
+</script>
