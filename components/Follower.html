@@ -1,10 +1,12 @@
 <li class={className}>
-    <Person person={follower} />
-    {#if follower.success}
-        OK!
-    {:elseif follower.failure}
-    Failed! {follower.failure}
-    {/if}
+    <span>
+        <Person person={follower} />
+        {#if follower.success}
+            Sent!
+        {:elseif follower.failure}
+        Failed! {follower.failure}
+        {/if}
+    </span>
 </li>
 
 <script>
@@ -28,9 +30,35 @@
 
 <style>
     .failure {
-        background: #ffcccc;
+        background: linear-gradient(to right, #ffcccc, transparent 50%);
     }
     .success {
-        background: #aaffee;
+        background: linear-gradient(to right, #ddbbff, transparent 50%);
+    }
+    .failure span, .success span {
+        transform: translatex(1.7em);
+        display: inline-block;
+    }
+    .failure span::before, .success span::before {
+        content: ' ';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -1em;
+        width: .8em;
+        background-image: url('ok.svg');
+        background-size: contain;
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+    .failure span::before {
+        background-image: url('fail.svg');
+    }
+    span {
+        transition: transform 200ms ease-out;
+    }
+
+    li {
+        overflow: hidden;
     }
 </style>

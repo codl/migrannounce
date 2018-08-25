@@ -19,12 +19,12 @@ gulp.task('js', function(){
 })
 
 gulp.task('the_rest', function(){
-    return gulp.src(['index.html', 'styles.css'])
+    return gulp.src(['index.html', 'styles.css', 'ok.svg', 'fail.svg'])
         .pipe(gulp.dest('dist'))
 })
 
 gulp.task('default', ['js', 'the_rest'])
 
 gulp.task('watch', ['default'], function(){
-    gulp.watch(['index.html', 'main.js', 'styles.css', 'components/*.html', 'lib/*.js'], ['default'])
+    gulp.watch(['index.html', 'main.js', 'styles.css', 'components/*.html', 'lib/*.js', '*.svg'], ['default'])
 })
