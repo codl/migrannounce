@@ -10,6 +10,6 @@
     "svelte": "^2.13.1"
   },
   "scripts": {
-    "build": "rollup -c"
+    "build": "gulp"
   }
 }
