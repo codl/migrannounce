@@ -4,7 +4,7 @@
 
 {:else}
 
-    <p>Hi, <Person person={me} />! <button on:click="reload()">Log out</button></p>
+    <p>You are logged in as <Person person={me} /> <button on:click="reload()">Log out</button></p>
 
     {#if !loaded}
     <p>Your followers are being fetched... <span class='spinner'/></p>
