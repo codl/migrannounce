@@ -74,7 +74,7 @@ import LoggedInUI from './components/LoggedInUI.html';
     let log_in = server => {
         log_in_spinner(true);
         let nserver = normalise_server(server);
-        get_app_credentials(nserver).then(creds => navigate_to_oauth(nserver, creds['client_id']))
+        get_app_credentials(nserver).then(creds => navigate_to_oauth(nserver, creds['client_id'], creds['redirect_uri']))
             .catch((e) => {
                 error('Something went wrong communicating with ' + server + '. Try again?')
                 log_in_spinner(false);
@@ -90,12 +90,12 @@ import LoggedInUI from './components/LoggedInUI.html';
     let unerror = () => error(false)
 
 
-    let navigate_to_oauth = (server, client_id) => {
+    let navigate_to_oauth = (server, client_id, redirect_uri) => {
         let url = new URL(server);
         url.pathname = '/oauth/authorize'
         url.search = new URLSearchParams({
             "client_id": client_id,
-            "redirect_uri": redirect_uri_for(server),
+            "redirect_uri": redirect_uri,
             "response_type": "code",
             "scope": "read write",
         })
