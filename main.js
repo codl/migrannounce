@@ -57,9 +57,9 @@ import LoggedInUI from './components/LoggedInUI.html';
         endpoint.pathname = '/api/v1/apps';
         let body = new URLSearchParams()
         body.set('scopes', 'read write')
-        body.set('client_name', 'Migration tool (DEV)')
+        body.set('client_name', 'Migration tool')
         body.set('redirect_uris', redirect_uri_for(server))
-        //body.set('website', 'fill this in later')
+        body.set('website', 'https://migrannounce.tools.codl.fr/')
 
         let result = fetch(endpoint, {
             "method": "POST",
