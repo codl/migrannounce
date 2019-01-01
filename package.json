@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "parse-link-header": "^1.0.1",
     "rollup": "^0.65.0",
     "rollup-plugin-commonjs": "^9.1.6",
