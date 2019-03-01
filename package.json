@@ -6,7 +6,7 @@
     "rollup-plugin-commonjs": "^9.1.6",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-svelte": "^4.2.1",
+    "rollup-plugin-svelte": "^5.0.3",
     "svelte": "^2.13.2"
   },
   "scripts": {
