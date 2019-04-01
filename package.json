@@ -2,7 +2,7 @@
   "dependencies": {
     "gulp": "^3.9.1",
     "parse-link-header": "^1.0.1",
-    "rollup": "^0.65.0",
+    "rollup": "^1.7.4",
     "rollup-plugin-commonjs": "^9.1.6",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^3.3.0",
